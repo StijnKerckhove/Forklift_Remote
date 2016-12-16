@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">Forklift Remote</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_settings">Settings</string>
+
+    <string name="action_share">Share</string>
+    <string name="action_reply">Reply</string>
+
+    <string name="ok">OK</string>
+    <string name="bluetooth_not_supported_dialog_title">Bluetooth not supported</string>
+    <string name="bluetooth_not_supported">Bluetooth is not supported on this device. This application requires Bluetooth to function.</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+</resources>
