@@ -1,5 +1,6 @@
 package stijnkerckhove.forklift_remote.fragments;
 
+import android.app.ProgressDialog;
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -27,8 +28,11 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import stijnkerckhove.forklift_remote.BluetoothController;
+import stijnkerckhove.forklift_remote.DialogController;
 import stijnkerckhove.forklift_remote.MainActivity;
+import stijnkerckhove.forklift_remote.ManageConnectionTask;
 import stijnkerckhove.forklift_remote.R;
+import stijnkerckhove.forklift_remote.exceptions.FailedBluetoothConnectionException;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -181,8 +185,7 @@ public class LinkBluetoothDeviceFragment extends ListFragment {
         discoveredDevicesListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                BluetoothDevice selectedDevice = bluetoothController.getDiscoveredDevice(i);
-                Log.w("Test", "test");
+                bluetoothController.connect(bluetoothController.getDiscoveredDevice(i));
             }
         });
 
@@ -190,7 +193,7 @@ public class LinkBluetoothDeviceFragment extends ListFragment {
 
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-
+                bluetoothController.connect(bluetoothController.getPairedDevice(i));
             }
         });
 

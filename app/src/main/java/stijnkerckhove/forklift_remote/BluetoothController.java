@@ -1,7 +1,9 @@
 package stijnkerckhove.forklift_remote;
 
+import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothSocket;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.v7.app.AlertDialog;
@@ -9,18 +11,18 @@ import android.support.v7.app.AppCompatActivity;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Created by Stijn on 14/12/2016.
  */
 
 public class BluetoothController {
+    public static final int REQUEST_ENABLE_BT = 100;
     private AppCompatActivity activity;
     private BluetoothAdapter mBluetoothAdapter;
     private List<BluetoothDevice> discoveredDevices;
-
-    public static final int REQUEST_ENABLE_BT = 100;
+    private List<BluetoothDevice> pairedDevices;
+    private BluetoothSocket bluetoothSocket;
 
     public BluetoothController(AppCompatActivity activity) {
         this.activity = activity;
@@ -62,13 +64,15 @@ public class BluetoothController {
         activity.startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
     }
 
-    public Set<BluetoothDevice> getPairedDevices() {
-        return mBluetoothAdapter.getBondedDevices();
+    public List<BluetoothDevice> getPairedDevices() {
+        pairedDevices = new ArrayList<>();
+        pairedDevices.addAll(mBluetoothAdapter.getBondedDevices());
+        return pairedDevices;
     }
 
     public void startDiscovery() {
         mBluetoothAdapter.startDiscovery();
-    };
+    }
 
     public void stopDiscovery() {
         mBluetoothAdapter.cancelDiscovery();
@@ -82,8 +86,28 @@ public class BluetoothController {
         return discoveredDevices.get(i);
     }
 
+    public BluetoothDevice getPairedDevice(int i) {
+        return pairedDevices.get(i);
+    }
+
+    public void connect(BluetoothDevice bluetoothDevice) {
+//        ConnectThread connectThread = new ConnectThread(bluetoothDevice, activity);
+//        connectThread.start();
+        ConnectTask connectTask = new ConnectTask(bluetoothDevice, activity, this);
+        connectTask.execute();
+        bluetoothSocket = connectTask.getBluetoothSocket();
+    }
+
     public void clearDiscoveredDevices() {
         discoveredDevices.clear();
+    }
+
+    public void setBluetoothSocket(BluetoothSocket socket) {
+        bluetoothSocket = socket;
+    }
+
+    public BluetoothSocket getBluetoothSocket() {
+        return bluetoothSocket;
     }
 
 }

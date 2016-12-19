@@ -1,13 +1,24 @@
 package stijnkerckhove.forklift_remote.fragments;
 
+import android.app.Activity;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.AppCompatMultiAutoCompleteTextView;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageButton;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import stijnkerckhove.forklift_remote.MainActivity;
+import stijnkerckhove.forklift_remote.ManageConnectionTask;
 import stijnkerckhove.forklift_remote.R;
 
 /**
@@ -30,6 +41,21 @@ public class ControllerFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
 
+    private MainActivity mainActivity;
+    private ManageConnectionTask manageConnectionTask;
+
+    @BindView(R.id.driveForwardButton)
+    ImageButton driveForwardButton;
+
+    @BindView(R.id.driveBackwardButton)
+    ImageButton driveBackwardButton;
+
+    @BindView(R.id.turnLeftButton)
+    ImageButton turnLeftButton;
+
+    @BindView(R.id.turnRightButton)
+    ImageButton turnRightButton;
+
     public ControllerFragment() {
         // Required empty public constructor
     }
@@ -50,6 +76,45 @@ public class ControllerFragment extends Fragment {
         args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
         return fragment;
+    }
+
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        ButterKnife.bind(this, view);
+        mainActivity = (MainActivity) getActivity();
+        manageConnectionTask = new ManageConnectionTask(mainActivity.getBluetoothController().getBluetoothSocket(), getContext());
+
+        driveForwardButton.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                switch(motionEvent.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        manageConnectionTask.write("forward".getBytes());
+                        break;
+                    case MotionEvent.ACTION_UP:
+                        manageConnectionTask.write("stop".getBytes());
+                        break;
+                }
+                return false;
+            }
+        });
+
+        driveBackwardButton.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                switch(motionEvent.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        manageConnectionTask.write("backward".getBytes());
+                        break;
+                    case MotionEvent.ACTION_UP:
+                        manageConnectionTask.write("stop".getBytes());
+                        break;
+                }
+                return false;
+            }
+        });
+
+
     }
 
     @Override
