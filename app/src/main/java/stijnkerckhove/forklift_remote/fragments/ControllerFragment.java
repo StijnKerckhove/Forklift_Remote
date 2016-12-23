@@ -1,18 +1,13 @@
 package stijnkerckhove.forklift_remote.fragments;
 
-import android.app.Activity;
-import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.AppCompatMultiAutoCompleteTextView;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageButton;
 
 import butterknife.BindView;
@@ -34,27 +29,28 @@ public class ControllerFragment extends Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-
+    @BindView(R.id.driveForwardButton)
+    ImageButton driveForwardButton;
+    @BindView(R.id.driveBackwardButton)
+    ImageButton driveBackwardButton;
+    @BindView(R.id.turnLeftButton)
+    ImageButton turnLeftButton;
+    @BindView(R.id.turnRightButton)
+    ImageButton turnRightButton;
+    @BindView(R.id.liftUpButton)
+    ImageButton liftUpButon;
+    @BindView(R.id.liftDownButton)
+    ImageButton liftDownButton;
+    @BindView(R.id.tiltFowardButton)
+    ImageButton tiltForwardButton;
+    @BindView(R.id.tiltBackwardButton)
+    ImageButton tiltBackwardButton;
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
-
     private OnFragmentInteractionListener mListener;
-
     private MainActivity mainActivity;
     private ManageConnectionTask manageConnectionTask;
-
-    @BindView(R.id.driveForwardButton)
-    ImageButton driveForwardButton;
-
-    @BindView(R.id.driveBackwardButton)
-    ImageButton driveBackwardButton;
-
-    @BindView(R.id.turnLeftButton)
-    ImageButton turnLeftButton;
-
-    @BindView(R.id.turnRightButton)
-    ImageButton turnRightButton;
 
     public ControllerFragment() {
         // Required empty public constructor
@@ -87,12 +83,12 @@ public class ControllerFragment extends Fragment {
         driveForwardButton.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
-                switch(motionEvent.getAction()) {
+                switch (motionEvent.getAction()) {
                     case MotionEvent.ACTION_DOWN:
-                        manageConnectionTask.write("forward".getBytes());
+                        manageConnectionTask.write("driveforward".getBytes());
                         break;
                     case MotionEvent.ACTION_UP:
-                        manageConnectionTask.write("stop".getBytes());
+                        manageConnectionTask.write("drivestop".getBytes());
                         break;
                 }
                 return false;
@@ -102,18 +98,107 @@ public class ControllerFragment extends Fragment {
         driveBackwardButton.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
-                switch(motionEvent.getAction()) {
+                switch (motionEvent.getAction()) {
                     case MotionEvent.ACTION_DOWN:
-                        manageConnectionTask.write("backward".getBytes());
+                        manageConnectionTask.write("drivebackward".getBytes());
                         break;
                     case MotionEvent.ACTION_UP:
-                        manageConnectionTask.write("stop".getBytes());
+                        manageConnectionTask.write("drivestop".getBytes());
                         break;
                 }
                 return false;
             }
         });
 
+        liftUpButon.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                switch (motionEvent.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        manageConnectionTask.write("liftup".getBytes());
+                        break;
+                    case MotionEvent.ACTION_UP:
+                        manageConnectionTask.write("liftstop".getBytes());
+                        break;
+                }
+                return false;
+            }
+        });
+
+        liftDownButton.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                switch (motionEvent.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        manageConnectionTask.write("liftdown".getBytes());
+                        break;
+                    case MotionEvent.ACTION_UP:
+                        manageConnectionTask.write("liftstop".getBytes());
+                        break;
+                }
+                return false;
+            }
+        });
+
+        turnLeftButton.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                switch (motionEvent.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        manageConnectionTask.write("steerleft".getBytes());
+                        break;
+                    case MotionEvent.ACTION_UP:
+                        manageConnectionTask.write("steerstop".getBytes());
+                        break;
+                }
+                return false;
+            }
+        });
+
+        turnRightButton.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                switch (motionEvent.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        manageConnectionTask.write("steerright".getBytes());
+                        break;
+                    case MotionEvent.ACTION_UP:
+                        manageConnectionTask.write("steerstop".getBytes());
+                        break;
+                }
+                return false;
+            }
+        });
+
+        tiltForwardButton.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                switch (motionEvent.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        manageConnectionTask.write("tiltforward".getBytes());
+                        break;
+                    case MotionEvent.ACTION_UP:
+                        manageConnectionTask.write("tiltstop".getBytes());
+                        break;
+                }
+                return false;
+            }
+        });
+
+        tiltBackwardButton.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                switch (motionEvent.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        manageConnectionTask.write("tiltbackward".getBytes());
+                        break;
+                    case MotionEvent.ACTION_UP:
+                        manageConnectionTask.write("tiltstop".getBytes());
+                        break;
+                }
+                return false;
+            }
+        });
 
     }
 
