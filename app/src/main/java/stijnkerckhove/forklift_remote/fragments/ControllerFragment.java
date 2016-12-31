@@ -1,20 +1,36 @@
 package stijnkerckhove.forklift_remote.fragments;
 
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothSocket;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import stijnkerckhove.forklift_remote.MainActivity;
 import stijnkerckhove.forklift_remote.ManageConnectionTask;
 import stijnkerckhove.forklift_remote.R;
+
+enum CONNECTIONSTATUS {
+    CONNECTED,
+    DISCONNECTED
+}
 
 /**
  * A simple {@link Fragment} subclass.
@@ -45,15 +61,40 @@ public class ControllerFragment extends Fragment {
     ImageButton tiltForwardButton;
     @BindView(R.id.tiltBackwardButton)
     ImageButton tiltBackwardButton;
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    @BindView(R.id.deviceStatusTextview)
+    TextView deviceStatusTextview;
+    @BindView(R.id.deviceStatusImageView)
+    ImageView deviceImageView;
+
     private OnFragmentInteractionListener mListener;
     private MainActivity mainActivity;
     private ManageConnectionTask manageConnectionTask;
+    private BroadcastReceiver broadcastReceiver;
+    private IntentFilter filter;
 
     public ControllerFragment() {
         // Required empty public constructor
+
+        filter = new IntentFilter();
+        filter.addAction(BluetoothDevice.ACTION_ACL_CONNECTED);
+        filter.addAction(BluetoothDevice.ACTION_ACL_DISCONNECTED);
+
+        broadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                String action = intent.getAction();
+
+                switch (action){
+                    case BluetoothDevice.ACTION_ACL_CONNECTED:
+                        changeDeviceConnectionStatus(CONNECTIONSTATUS.CONNECTED);
+                        break;
+                    case BluetoothDevice.ACTION_ACL_DISCONNECTED:
+                        changeDeviceConnectionStatus(CONNECTIONSTATUS.DISCONNECTED);
+                        mainActivity.getBluetoothController().disconnectSocket();
+                        break;
+                }
+            }
+        };
     }
 
     /**
@@ -75,130 +116,149 @@ public class ControllerFragment extends Fragment {
     }
 
     @Override
+    public void onResume() {
+        mainActivity.registerReceiver(broadcastReceiver, filter);
+        super.onResume();
+    }
+
+    @Override
+    public void onPause() {
+        mainActivity.unregisterReceiver(broadcastReceiver);
+        super.onPause();
+    }
+
+    @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         ButterKnife.bind(this, view);
         mainActivity = (MainActivity) getActivity();
-        manageConnectionTask = new ManageConnectionTask(mainActivity.getBluetoothController().getBluetoothSocket(), getContext());
+        mainActivity.getNavigationView().getMenu().getItem(0).setChecked(true);
+        BluetoothSocket bluetoothSocket = mainActivity.getBluetoothController().getBluetoothSocket();
 
-        driveForwardButton.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                switch (motionEvent.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
-                        manageConnectionTask.write("driveforward".getBytes());
-                        break;
-                    case MotionEvent.ACTION_UP:
-                        manageConnectionTask.write("drivestop".getBytes());
-                        break;
-                }
-                return false;
-            }
-        });
+        if(bluetoothSocket != null && bluetoothSocket.isConnected()) {
+            manageConnectionTask = new ManageConnectionTask(bluetoothSocket, getContext());
 
-        driveBackwardButton.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                switch (motionEvent.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
-                        manageConnectionTask.write("drivebackward".getBytes());
-                        break;
-                    case MotionEvent.ACTION_UP:
-                        manageConnectionTask.write("drivestop".getBytes());
-                        break;
-                }
-                return false;
-            }
-        });
+            changeDeviceConnectionStatus(CONNECTIONSTATUS.CONNECTED);
 
-        liftUpButon.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                switch (motionEvent.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
-                        manageConnectionTask.write("liftup".getBytes());
-                        break;
-                    case MotionEvent.ACTION_UP:
-                        manageConnectionTask.write("liftstop".getBytes());
-                        break;
+            driveForwardButton.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View view, MotionEvent motionEvent) {
+                    switch (motionEvent.getAction()) {
+                        case MotionEvent.ACTION_DOWN:
+                            manageConnectionTask.write("driveforward".getBytes());
+                            break;
+                        case MotionEvent.ACTION_UP:
+                            manageConnectionTask.write("drivestop".getBytes());
+                            break;
+                    }
+                    return false;
                 }
-                return false;
-            }
-        });
+            });
 
-        liftDownButton.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                switch (motionEvent.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
-                        manageConnectionTask.write("liftdown".getBytes());
-                        break;
-                    case MotionEvent.ACTION_UP:
-                        manageConnectionTask.write("liftstop".getBytes());
-                        break;
+            driveBackwardButton.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View view, MotionEvent motionEvent) {
+                    switch (motionEvent.getAction()) {
+                        case MotionEvent.ACTION_DOWN:
+                            manageConnectionTask.write("drivebackward".getBytes());
+                            break;
+                        case MotionEvent.ACTION_UP:
+                            manageConnectionTask.write("drivestop".getBytes());
+                            break;
+                    }
+                    return false;
                 }
-                return false;
-            }
-        });
+            });
 
-        turnLeftButton.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                switch (motionEvent.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
-                        manageConnectionTask.write("steerleft".getBytes());
-                        break;
-                    case MotionEvent.ACTION_UP:
-                        manageConnectionTask.write("steerstop".getBytes());
-                        break;
+            liftUpButon.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View view, MotionEvent motionEvent) {
+                    switch (motionEvent.getAction()) {
+                        case MotionEvent.ACTION_DOWN:
+                            manageConnectionTask.write("liftup".getBytes());
+                            break;
+                        case MotionEvent.ACTION_UP:
+                            manageConnectionTask.write("liftstop".getBytes());
+                            break;
+                    }
+                    return false;
                 }
-                return false;
-            }
-        });
+            });
 
-        turnRightButton.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                switch (motionEvent.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
-                        manageConnectionTask.write("steerright".getBytes());
-                        break;
-                    case MotionEvent.ACTION_UP:
-                        manageConnectionTask.write("steerstop".getBytes());
-                        break;
+            liftDownButton.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View view, MotionEvent motionEvent) {
+                    switch (motionEvent.getAction()) {
+                        case MotionEvent.ACTION_DOWN:
+                            manageConnectionTask.write("liftdown".getBytes());
+                            break;
+                        case MotionEvent.ACTION_UP:
+                            manageConnectionTask.write("liftstop".getBytes());
+                            break;
+                    }
+                    return false;
                 }
-                return false;
-            }
-        });
+            });
 
-        tiltForwardButton.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                switch (motionEvent.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
-                        manageConnectionTask.write("tiltforward".getBytes());
-                        break;
-                    case MotionEvent.ACTION_UP:
-                        manageConnectionTask.write("tiltstop".getBytes());
-                        break;
+            turnLeftButton.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View view, MotionEvent motionEvent) {
+                    switch (motionEvent.getAction()) {
+                        case MotionEvent.ACTION_DOWN:
+                            manageConnectionTask.write("steerleft".getBytes());
+                            break;
+                        case MotionEvent.ACTION_UP:
+                            manageConnectionTask.write("steerstop".getBytes());
+                            break;
+                    }
+                    return false;
                 }
-                return false;
-            }
-        });
+            });
 
-        tiltBackwardButton.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                switch (motionEvent.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
-                        manageConnectionTask.write("tiltbackward".getBytes());
-                        break;
-                    case MotionEvent.ACTION_UP:
-                        manageConnectionTask.write("tiltstop".getBytes());
-                        break;
+            turnRightButton.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View view, MotionEvent motionEvent) {
+                    switch (motionEvent.getAction()) {
+                        case MotionEvent.ACTION_DOWN:
+                            manageConnectionTask.write("steerright".getBytes());
+                            break;
+                        case MotionEvent.ACTION_UP:
+                            manageConnectionTask.write("steerstop".getBytes());
+                            break;
+                    }
+                    return false;
                 }
-                return false;
-            }
-        });
+            });
+
+            tiltForwardButton.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View view, MotionEvent motionEvent) {
+                    switch (motionEvent.getAction()) {
+                        case MotionEvent.ACTION_DOWN:
+                            manageConnectionTask.write("tiltforward".getBytes());
+                            break;
+                        case MotionEvent.ACTION_UP:
+                            manageConnectionTask.write("tiltstop".getBytes());
+                            break;
+                    }
+                    return false;
+                }
+            });
+
+            tiltBackwardButton.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View view, MotionEvent motionEvent) {
+                    switch (motionEvent.getAction()) {
+                        case MotionEvent.ACTION_DOWN:
+                            manageConnectionTask.write("tiltbackward".getBytes());
+                            break;
+                        case MotionEvent.ACTION_UP:
+                            manageConnectionTask.write("tiltstop".getBytes());
+                            break;
+                    }
+                    return false;
+                }
+            });
+        }
 
     }
 
@@ -206,8 +266,8 @@ public class ControllerFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+//            mParam1 = getArguments().getString(ARG_PARAM1);
+//            mParam2 = getArguments().getString(ARG_PARAM2);
         }
     }
 
@@ -244,5 +304,18 @@ public class ControllerFragment extends Fragment {
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
+    }
+
+    public void changeDeviceConnectionStatus(CONNECTIONSTATUS status) {
+        if(status == CONNECTIONSTATUS.CONNECTED) {
+            deviceStatusTextview.setTextColor(ContextCompat.getColor(mainActivity, R.color.green));
+            deviceStatusTextview.setText(R.string.deviceConnected);
+            deviceImageView.setImageResource(R.drawable.ic_info_green_20dp);
+        }
+        else {
+            deviceStatusTextview.setTextColor(ContextCompat.getColor(mainActivity, R.color.red));
+            deviceStatusTextview.setText(R.string.deviceDisconnected);
+            deviceImageView.setImageResource(R.drawable.ic_info_red_20dp);
+        }
     }
 }

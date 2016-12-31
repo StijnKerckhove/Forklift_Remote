@@ -4,17 +4,10 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:weightSum="1"
-    tools:context="stijnkerckhove.forklift_remote.fragments.LinkBluetoothDeviceFragment">
+    tools:context="stijnkerckhove.forklift_remote.fragments.LinkBluetoothDeviceFragment"
+    android:padding="10dp">
 
     <!-- TODO: Update blank fragment layout -->
-
-    <Button
-        android:id="@+id/searchDevicesButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:minHeight="50dp"
-        android:text="Scan for devices" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -33,12 +26,18 @@
             android:visibility="gone"
             android:textAppearance="@style/TextAppearance.AppCompat.Button" />
 
-        <ListView
-            android:id="@+id/discoveredDevicesListView"
+        <ScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:visibility="gone"
-            android:elevation="0dp" />
+            android:fillViewport="true">
+
+            <ListView
+                android:id="@+id/discoveredDevicesListView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                android:elevation="0dp" />
+        </ScrollView>
 
         <ProgressBar
             style="?android:attr/progressBarStyleSmall"
@@ -57,11 +56,28 @@
             android:text="PAIRED DEVICES"
             android:textAppearance="@style/TextAppearance.AppCompat.Button" />
 
-        <ListView
-            android:id="@+id/pairedDevicesListView"
+        <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="match_parent"
+            android:fillViewport="true">
+
+            <ListView
+                android:id="@+id/pairedDevicesListView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+        </ScrollView>
 
     </LinearLayout>
+
+    <Button
+        android:id="@+id/searchDevicesButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="50dp"
+        android:text="Scan for devices"
+        android:background="@color/test"
+        android:textColor="@android:color/white"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true" />
 
 </RelativeLayout>

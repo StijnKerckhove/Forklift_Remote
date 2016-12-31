@@ -124,6 +124,8 @@ public class LinkBluetoothDeviceFragment extends ListFragment {
         mainActivity = (MainActivity) getActivity();
         bluetoothController = mainActivity.getBluetoothController();
 
+        mainActivity.getNavigationView().getMenu().getItem(1).setChecked(true);
+
     }
 
     @Override

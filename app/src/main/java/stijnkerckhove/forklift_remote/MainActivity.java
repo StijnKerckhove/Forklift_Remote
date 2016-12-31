@@ -2,9 +2,7 @@ package stijnkerckhove.forklift_remote;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -13,7 +11,6 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 
 import butterknife.ButterKnife;
 import stijnkerckhove.forklift_remote.fragments.FragmentFactory;
@@ -23,6 +20,7 @@ public class MainActivity extends AppCompatActivity
 
     private FragmentFactory fragmentFactory;
     private BluetoothController bluetoothController;
+    private NavigationView navigationView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,22 +32,12 @@ public class MainActivity extends AppCompatActivity
         fragmentFactory = new FragmentFactory(this);
         bluetoothController = new BluetoothController(this);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
-
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
         navigationView.getMenu().getItem(0).setChecked(true);
@@ -69,7 +57,7 @@ public class MainActivity extends AppCompatActivity
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
         //Do something when bluetooth gets enabled
-        if(requestCode == BluetoothController.REQUEST_ENABLE_BT) {
+        if (requestCode == BluetoothController.REQUEST_ENABLE_BT) {
             if (resultCode != -1) {
                 Log.w("Bluetooth not enabled", BLUETOOTH_SERVICE);
             } else {
@@ -81,7 +69,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void pairDevice() {
-        Log.w("Pair device", BLUETOOTH_SERVICE);
+        fragmentFactory.navigateToLinkBluetoothDeviceFragment();
     }
 
     @Override
@@ -97,7 +85,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
+        //getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
 
@@ -128,8 +116,6 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_connect) {
             fragmentFactory.navigateToLinkBluetoothDeviceFragment();
 
-        } else if (id == R.id.nav_settings) {
-
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -140,4 +126,10 @@ public class MainActivity extends AppCompatActivity
     public BluetoothController getBluetoothController() {
         return bluetoothController;
     }
+
+    public NavigationView getNavigationView() {
+        return navigationView;
+    }
+
+
 }

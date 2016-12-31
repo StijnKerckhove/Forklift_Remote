@@ -110,4 +110,10 @@ public class BluetoothController {
         return bluetoothSocket;
     }
 
+    public BluetoothAdapter getBluetoothAdapter() { return mBluetoothAdapter; }
+
+    public void disconnectSocket() {
+        bluetoothSocket = null;
+    }
+
 }

@@ -13,6 +13,11 @@
     <string name="bluetooth_not_supported_dialog_title">Bluetooth not supported</string>
     <string name="bluetooth_not_supported">Bluetooth is not supported on this device. This application requires Bluetooth to function.</string>
 
+    <string name="deviceConnected">Connected to device</string>
+    <string name="deviceDisconnected">Disconnected from device</string>
+
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="nav_header_title">Remote controller for RC forklift</string>
+    <string name="nav_header_name">&#169;2016 - Stijn Kerckhove</string>
 </resources>
